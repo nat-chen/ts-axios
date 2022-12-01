@@ -1,30 +1,74 @@
 <template>
-  <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-  </nav>
-  <router-view/>
+  <a-form
+    :model="loginForm"
+    class="login-form"
+    @submit.prevent="handleSubmit"
+  >
+    <a-form-item
+      label="用户名"
+      name="username"
+    >
+      <a-input v-model:value="loginForm.username" />
+    </a-form-item>
+
+    <a-form-item
+      label="密 码"
+      name="password"
+    >
+      <a-input-password v-model:value="loginForm.password" />
+    </a-form-item>
+
+    <a-form-item>
+      <a-button type="primary" html-type="submit" class="login-form-button">
+        登 录
+      </a-button>
+
+      <a-button type="primary" danger @click="onTestError">
+        失败测试
+      </a-button>
+    </a-form-item>
+  </a-form>
 </template>
 
+<script lang="ts" setupt>
+import { reactive } from 'vue';
+import { login, loginRaw, getUserInfo } from '@/api';
+
+interface FormState {
+  username: string;
+  password: string;
+}
+
+const loginForm = reactive<FormState>({
+  username: '',
+  password: '',
+});
+
+const handleSubmit = async (values: any) => {
+  const form = {
+    username: loginForm.username,
+    password: loginForm.password,
+  };
+
+  const res = await login(form)
+  console.log(res.token)
+  const res2 = await loginRaw(form)
+  console.log(res2.token)
+  
+  const userInfo = await getUserInfo()
+  console.log(userInfo.username);
+}
+</script>
+
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+.login-form {
+  max-width: 300px;
 }
-
-nav {
-  padding: 30px;
+.login-form-forgot {
+  float: right;
 }
-
-nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-nav a.router-link-exact-active {
-  color: #42b983;
+.login-form-button {
+  width: 30%;
+  margin-right: 20px;
 }
 </style>
